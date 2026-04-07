@@ -1,0 +1,52 @@
+@import "tailwindcss";
+
+:root {
+  --background: #f2efe8;
+  --foreground: #182123;
+  --card: #fffdf8;
+  --ink-soft: #556367;
+  --brand: #0f766e;
+  --brand-2: #f97316;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-space-grotesk);
+  --font-mono: var(--font-ibm-plex-mono);
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-space-grotesk), sans-serif;
+}
+
+.app-bg {
+  background:
+    radial-gradient(circle at 8% 12%, rgb(15 118 110 / 0.18), transparent 28%),
+    radial-gradient(circle at 92% 18%, rgb(249 115 22 / 0.16), transparent 26%),
+    radial-gradient(circle at 20% 88%, rgb(23 37 84 / 0.1), transparent 22%),
+    var(--background);
+}
+
+.card-shadow {
+  box-shadow:
+    0 2px 0 rgb(24 33 35 / 0.06),
+    0 24px 30px rgb(24 33 35 / 0.08);
+}
+
+.rise {
+  animation: rise-in 500ms ease-out both;
+}
+
+@keyframes rise-in {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
