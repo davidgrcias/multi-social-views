@@ -64,16 +64,23 @@ Catatan integritas data:
 
 ## Kredensial (Wajib Untuk Akurasi)
 
-Isi di panel "Optional: Kredensial API Official" pada UI, atau set lewat env:
+Isi di panel kredensial pada UI, atau set lewat `.env.local`:
 
 ```bash
+# Opsi A (disarankan)
 NEXT_PUBLIC_YOUTUBE_API_KEY=
 NEXT_PUBLIC_TIKTOK_ACCESS_TOKEN=
 NEXT_PUBLIC_INSTAGRAM_ACCESS_TOKEN=
 NEXT_PUBLIC_INSTAGRAM_USER_ID=
+
+# Opsi B (nama biasa juga didukung)
+YOUTUBE_API_KEY=
+TIKTOK_ACCESS_TOKEN=
+INSTAGRAM_ACCESS_TOKEN=
+INSTAGRAM_USER_ID=
 ```
 
-Untuk development lokal, salin `.env.example` menjadi `.env.local`.
+Setelah mengubah `.env.local`, restart `npm run dev` agar nilai terbaca.
 
 ## Deploy GitHub Pages
 

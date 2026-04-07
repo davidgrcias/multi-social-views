@@ -56,6 +56,7 @@ type YoutubeVideosResponse = {
 };
 
 type YoutubeVideoItem = NonNullable<YoutubeVideosResponse["items"]>[number];
+type YoutubeChannelItem = NonNullable<YoutubeChannelResponse["items"]>[number];
 
 function cleanYoutubeInput(input: string): string {
   return input.trim().replace(/^https?:\/\/(www\.)?/i, "").replace(/\/+$/, "");
@@ -86,6 +87,20 @@ function resolveChannelRef(input: string): { forHandle?: string; id?: string } {
   return { forHandle: cleaned.startsWith("@") ? cleaned : `@${cleaned}` };
 }
 
+function extractYoutubeSlug(input: string): string | null {
+  const cleaned = cleanYoutubeInput(input);
+
+  if (cleaned.startsWith("youtube.com/")) {
+    const path = cleaned.replace(/^youtube\.com\//i, "").split("/")[0] ?? "";
+    if (!path || path.startsWith("@") || path === "channel" || path === "c") {
+      return null;
+    }
+    return path;
+  }
+
+  return null;
+}
+
 async function fetchJson<T>(url: URL): Promise<T> {
   const response = await fetch(url.toString());
   if (!response.ok) {
@@ -104,20 +119,44 @@ export async function fetchYoutubeData(
 
   const ref = resolveChannelRef(channelInput);
 
-  const channelUrl = new URL(`${YOUTUBE_API_BASE}/channels`);
-  channelUrl.searchParams.set("part", "snippet,statistics,contentDetails");
-  channelUrl.searchParams.set("maxResults", "1");
-  channelUrl.searchParams.set("key", apiKey);
+  const baseParams: Record<string, string> = {
+    part: "snippet,statistics,contentDetails",
+    maxResults: "1",
+    key: apiKey,
+  };
+
+  const channelCandidates: Array<Record<string, string>> = [];
   if (ref.id) {
-    channelUrl.searchParams.set("id", ref.id);
-  } else if (ref.forHandle) {
-    channelUrl.searchParams.set("forHandle", ref.forHandle);
+    channelCandidates.push({ ...baseParams, id: ref.id });
+  }
+  if (ref.forHandle) {
+    channelCandidates.push({ ...baseParams, forHandle: ref.forHandle });
   }
 
-  const channelData = await fetchJson<YoutubeChannelResponse>(channelUrl);
-  const channel = channelData.items?.[0];
+  const slug = extractYoutubeSlug(channelInput);
+  if (slug) {
+    channelCandidates.push({ ...baseParams, forUsername: slug });
+  }
+
+  let channel: YoutubeChannelItem | undefined;
+
+  for (const params of channelCandidates) {
+    const channelUrl = new URL(`${YOUTUBE_API_BASE}/channels`);
+    for (const [key, value] of Object.entries(params)) {
+      channelUrl.searchParams.set(key, value);
+    }
+
+    const channelData = await fetchJson<YoutubeChannelResponse>(channelUrl);
+    if (channelData.items?.[0]) {
+      channel = channelData.items[0];
+      break;
+    }
+  }
+
   if (!channel) {
-    throw new Error("Channel YouTube tidak ditemukan.");
+    throw new Error(
+      "Channel YouTube tidak ditemukan. Pakai format @handle atau channel ID agar akurat.",
+    );
   }
 
   const uploadsPlaylistId = channel.contentDetails?.relatedPlaylists?.uploads;

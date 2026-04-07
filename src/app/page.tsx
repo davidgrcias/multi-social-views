@@ -170,7 +170,8 @@ export default function Home() {
             </summary>
             <p className="mt-2 text-xs text-[var(--ink-soft)]">
               Dashboard ini tidak menampilkan angka simulasi. Jika key/token belum
-              valid, status platform ditandai sebagai data tidak tersedia.
+              valid, status platform ditandai sebagai data tidak tersedia. Kamu
+              bisa isi dari `.env.local` atau input manual di sini.
             </p>
             <div className="mt-4 grid gap-3 md:grid-cols-2">
               <label className="flex flex-col gap-2 text-sm">
