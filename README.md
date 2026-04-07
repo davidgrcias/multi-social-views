@@ -52,12 +52,17 @@ Catatan penting dari dokumentasi resmi:
 2. TikTok Display API butuh OAuth token dengan scope `user.info.basic` dan `video.list`.
 3. Instagram views/insights hanya tersedia untuk akun Business/Creator dengan permission insights yang sesuai.
 
-Karena itu, aplikasi punya 2 mode:
+Karena itu, aplikasi punya 2 status:
 
-1. Official API mode (jika kredensial diisi)
-2. Fallback demo mode (tetap tampil untuk presentasi jika kredensial belum ada)
+1. Official API mode (data valid tampil)
+2. Unavailable mode (tanpa angka simulasi jika key/token tidak valid)
 
-## Kredensial (Opsional)
+Catatan integritas data:
+
+1. Aplikasi tidak mengarang angka views.
+2. Jika data official tidak bisa diambil, nilai ditampilkan sebagai tidak tersedia.
+
+## Kredensial (Wajib Untuk Akurasi)
 
 Isi di panel "Optional: Kredensial API Official" pada UI, atau set lewat env:
 

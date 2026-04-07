@@ -59,10 +59,20 @@ export default function Home() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string>("");
 
+  const knownTotals = useMemo(
+    () =>
+      platforms
+        .map((platform) => platform.totalViews)
+        .filter((value): value is number => typeof value === "number"),
+    [platforms],
+  );
+
   const totalAllViews = useMemo(
     () =>
-      platforms.reduce((sum, platform) => sum + (platform.totalViews ?? 0), 0),
-    [platforms],
+      knownTotals.length > 0
+        ? knownTotals.reduce((sum, value) => sum + value, 0)
+        : null,
+    [knownTotals],
   );
 
   const refreshData = async () => {
@@ -156,11 +166,11 @@ export default function Home() {
 
           <details className="mt-5 rounded-xl border border-black/10 bg-white/70 p-4">
             <summary className="cursor-pointer select-none text-sm font-semibold">
-              Optional: Kredensial API Official
+              Kredensial API Official (wajib untuk data akurat)
             </summary>
             <p className="mt-2 text-xs text-[var(--ink-soft)]">
-              Jika belum diisi, dashboard memakai mode demo fallback agar tetap
-              bisa dipresentasikan.
+              Dashboard ini tidak menampilkan angka simulasi. Jika key/token belum
+              valid, status platform ditandai sebagai data tidak tersedia.
             </p>
             <div className="mt-4 grid gap-3 md:grid-cols-2">
               <label className="flex flex-col gap-2 text-sm">
@@ -270,10 +280,12 @@ export default function Home() {
                   className={`rounded-full px-3 py-1 text-[10px] font-semibold uppercase tracking-widest ${
                     platform.source === "official-api"
                       ? "bg-emerald-100 text-emerald-800"
-                      : "bg-amber-100 text-amber-800"
+                      : "bg-zinc-200 text-zinc-700"
                   }`}
                 >
-                  {platform.source === "official-api" ? "Official API" : "Fallback"}
+                  {platform.source === "official-api"
+                    ? "Official API"
+                    : "Unavailable"}
                 </span>
               </header>
 
@@ -288,27 +300,34 @@ export default function Home() {
 
               <div className="mt-4">
                 <p className="text-sm font-semibold">5 konten terbaru</p>
-                <ul className="mt-2 space-y-2 text-sm">
-                  {platform.contents.slice(0, 5).map((item) => (
-                    <li
-                      key={item.id}
-                      className="rounded-xl border border-black/10 bg-white/80 px-3 py-2"
-                    >
-                      <a
-                        className="line-clamp-1 font-medium text-[var(--foreground)] hover:underline"
-                        href={item.url}
-                        target="_blank"
-                        rel="noreferrer"
+                {platform.contents.length === 0 ? (
+                  <p className="mt-2 rounded-xl border border-black/10 bg-white/70 px-3 py-2 text-xs text-[var(--ink-soft)]">
+                    Konten belum bisa ditampilkan karena kredensial API belum
+                    tersedia atau belum valid.
+                  </p>
+                ) : (
+                  <ul className="mt-2 space-y-2 text-sm">
+                    {platform.contents.slice(0, 5).map((item) => (
+                      <li
+                        key={item.id}
+                        className="rounded-xl border border-black/10 bg-white/80 px-3 py-2"
                       >
-                        {item.title}
-                      </a>
-                      <div className="mt-1 flex items-center justify-between text-xs text-[var(--ink-soft)]">
-                        <span>Views: {formatCount(item.views)}</span>
-                        <span>{prettyDate(item.publishedAt)}</span>
-                      </div>
-                    </li>
-                  ))}
-                </ul>
+                        <a
+                          className="line-clamp-1 font-medium text-[var(--foreground)] hover:underline"
+                          href={item.url}
+                          target="_blank"
+                          rel="noreferrer"
+                        >
+                          {item.title}
+                        </a>
+                        <div className="mt-1 flex items-center justify-between text-xs text-[var(--ink-soft)]">
+                          <span>Views: {formatCount(item.views)}</span>
+                          <span>{prettyDate(item.publishedAt)}</span>
+                        </div>
+                      </li>
+                    ))}
+                  </ul>
+                )}
               </div>
 
               {platform.note ? (

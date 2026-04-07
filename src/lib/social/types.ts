@@ -16,7 +16,7 @@ export interface SocialPlatformData {
   profileImageUrl: string;
   totalViews: number | null;
   contents: SocialContentItem[];
-  source: "official-api" | "fallback";
+  source: "official-api" | "unavailable";
   fetchedAt: string;
   note?: string;
 }
